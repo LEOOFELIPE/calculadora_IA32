@@ -22,15 +22,18 @@ section .data:
     len_opc7 equ $ - opc7
     question db 10, 'O que deseja fazer ?', 0
     len_question equ $ - question
-
-    one dd 1
+    msg_dig1 db 10, 'Digite um digito ', 0
+    len_msg_dig1 equ $ - msg_dig1
+    msg_dig2 db 10, 'Digite outro digito ', 0
+    len_msg_dig2 equ $ - msg_dig2
+    
 
 section .bss
 
     user_option  resb 2
-    result       resb 10
-    operando1    resb 10
-    operando2    resb 10
+    result       resb 1
+    operando1    resb 2
+    operando2    resb 2
 
 section .text
 
@@ -39,7 +42,6 @@ section .text
 _start:
     call menu
     call get_option_user
-    call operations
     jmp exit
 
 menu:
@@ -75,7 +77,7 @@ option_one:
     mov ecx, opc1
     mov edx, len_opc1
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -83,7 +85,7 @@ option_two:
     mov ecx, opc2
     mov edx, len_opc2
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -91,7 +93,7 @@ option_three:
     mov ecx, opc3
     mov edx, len_opc3
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -99,7 +101,7 @@ option_four:
     mov ecx, opc4
     mov edx, len_opc4
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -107,7 +109,7 @@ option_five:
     mov ecx, opc5
     mov edx, len_opc5
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -115,7 +117,7 @@ option_six:
     mov ecx, opc6
     mov edx, len_opc6
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -123,7 +125,7 @@ option_seven:
     mov ecx, opc7
     mov edx, len_opc7
     mov eax, 4
-    mov ebx, 0
+    mov ebx, 1
     int 80h
     ret
 
@@ -131,7 +133,7 @@ get_option_user:
     ;Pega escolha do usuario
     call in_question
     call n_line
-   ; Recebe a resposta do usuário
+    ;Recebe a resposta do usuário
     mov eax, 3
     mov ebx, 0
     mov ecx, user_option
@@ -139,8 +141,12 @@ get_option_user:
     int 80h
 
     ; Transforma ASCI em número (só funciona de 0 a 9)
+    mov eax, 0
     mov eax, [user_option]
     sub eax, 0x30
+    call operations
+    ret
+
 
 operations:
     cmp eax, 1
@@ -160,22 +166,174 @@ operations:
     ret
 
 SOMA:
-    call option_one
-    call n_line
-    ret
+    ;msg1
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig1
+    mov edx, len_msg_dig1
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando1
+    mov edx, 2
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig2
+    mov edx, len_msg_dig2
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando2
+    mov edx, 2
+    int 80h
+
+    ; Transforma ASCI em número (só funciona de 0 a 9)
+    mov eax, [operando1]
+    sub eax, 0x30
+    mov ebx, [operando2]
+    sub ebx, 0x30
+    
+    add eax, ebx
+    add eax, 0x30
+    
+    mov [result], eax
+
+    ;imprimir 
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, result
+    mov edx, 1
+    int 80h
+    ret 
 
 SUB:
-    call option_two
-    call n_line
-    ret
+    ;msg1
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig1
+    mov edx, len_msg_dig1
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando1
+    mov edx, 2
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig2
+    mov edx, len_msg_dig2
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando2
+    mov edx, 2
+    int 80h
+
+    ; Transforma ASCI em número (só funciona de 0 a 9)
+    mov eax, [operando1]
+    sub eax, 0x30
+    mov ebx, [operando2]
+    sub ebx, 0x30
+    
+    sub eax, ebx
+    add eax, 0x30
+    
+    mov [result], eax
+
+    ;imprimir 
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, result
+    mov edx, 1
+    int 80h
+    ret 
 MUL:
-    call option_three
-    call n_line
-    ret
+    ;msg1
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig1
+    mov edx, len_msg_dig1
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando1
+    mov edx, 2
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig2
+    mov edx, len_msg_dig2
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando2
+    mov edx, 2
+    int 80h
+
+    ; Transforma ASCI em número (só funciona de 0 a 9)
+    mov eax, [operando1]
+    sub eax, 0x30
+    mov ebx, [operando2]
+    sub ebx, 0x30
+    
+    mul ebx
+    add eax, 0x30
+    
+    mov [result], eax
+
+    ;imprimir 
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, result
+    mov edx, 1
+    int 80h
+    ret 
 DIV:
-    call option_four
-    call n_line
-    ret
+    ;msg1
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig1
+    mov edx, len_msg_dig1
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando1
+    mov edx, 2
+    int 80h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg_dig2
+    mov edx, len_msg_dig2
+
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, operando2
+    mov edx, 2
+    int 80h
+
+    ; Transforma ASCI em número (só funciona de 0 a 9)
+    mov eax, [operando1]
+    sub eax, 0x30
+    mov ebx, [operando2]
+    sub ebx, 0x30
+    
+    div ebx
+    add eax, 0x30
+    
+    mov [result], eax
+
+    ;imprimir 
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, result
+    mov edx, 1
+    int 80h
+    ret 
 POT:
     call option_five
     call n_line
@@ -195,7 +353,7 @@ n_line:
     mov ecx, break_line
     mov edx, len_break_line
     mov eax, 4
-    mov ebx, 1
+    mov ebx, 0
     int 80h
     ret
 
